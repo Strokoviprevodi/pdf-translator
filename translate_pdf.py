@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 import fitz  # PyMuPDF
-import openai
+from openai import OpenAI
 import os
 
 app = FastAPI()
@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.post("/translate-pdf/")
 async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLang: str = Form(...)):
@@ -36,11 +36,11 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
         {"role": "user", "content": full_text[:12000]}  # limit due to token size
     ]
 
-    completion = openai.ChatCompletion.create(
+    completion = client.chat.completions.create(
         model="gpt-4",
         messages=messages,
         temperature=0.2
     )
 
-    translated = completion.choices[0].message["content"]
+    translated = completion.choices[0].message.content
     return {"translated_text": translated}
