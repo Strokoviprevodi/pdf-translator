@@ -1,7 +1,9 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 import fitz  # PyMuPDF
 from openai import OpenAI
+from fpdf import FPDF
 import os
 
 app = FastAPI()
@@ -43,4 +45,14 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     )
 
     translated = completion.choices[0].message.content
-    return {"translated_text": translated}
+
+    # Generate new PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, translated)
+
+    translated_pdf_path = "/tmp/translated.pdf"
+    pdf.output(translated_pdf_path)
+
+    return FileResponse(path=translated_pdf_path, filename="translated.pdf")
