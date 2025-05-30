@@ -5,6 +5,20 @@ import fitz  # PyMuPDF
 from openai import OpenAI
 from fpdf import FPDF
 import os
+import base64
+
+# =============== BASE64 ENCODED FONT (DejaVuSans.ttf, delni za prikaz; za produkcijo vzemi celoten base64 string) ===============
+dejavu_base64 = """
+AAEAAAARAQAABAAQRFNJRwAAAAEAAAAVAAAAHEdERUYAAAC8AAAAKAAAACBPUy8yAAABCAAAACAAAAAg
+AAACAAEAAAACAAAAAgAAAAEAAAAAAAAAAEAAAEAAAAQAAAEAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA
+...
+""" # To je delni prikaz. Za produkcijo je potreben celoten base64 string iz .ttf datoteke!
+
+font_path = "/tmp/DejaVuSans.ttf"
+
+if not os.path.exists(font_path):
+    with open(font_path, "wb") as f:
+        f.write(base64.b64decode(dejavu_base64))
 
 app = FastAPI()
 
@@ -35,7 +49,7 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     # Translate via GPT
     messages = [
         {"role": "system", "content": f"Prevedi iz {sourceLang} v {targetLang}."},
-        {"role": "user", "content": full_text[:12000]}  # limit due to token size
+        {"role": "user", "content": full_text[:12000]}  # limit zaradi tokenov
     ]
 
     completion = client.chat.completions.create(
@@ -46,6 +60,18 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
 
     translated = completion.choices[0].message.content
 
+<<<<<<< HEAD
+    # Generate new PDF with Unicode support
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.add_font("DejaVu", "", font_path, uni=True)
+    pdf.set_font("DejaVu", size=12)
+    pdf.multi_cell(0, 10, translated)
+    translated_pdf_path = "/tmp/translated.pdf"
+    pdf.output(translated_pdf_path)
+
+    return FileResponse(path=translated_pdf_path, filename="translated.pdf")
+=======
     # Generate new PDF
     pdf = FPDF()
     pdf.add_page()
@@ -56,3 +82,4 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     pdf.output(translated_pdf_path)
 
     return FileResponse(path=translated_pdf_path, filename="translated.pdf")
+>>>>>>> 6d9a06e05cf8dbdf2a4d2d6031a22347f5a15dee
