@@ -82,4 +82,4 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     pdf.output(translated_pdf_path)
 
     return FileResponse(path=translated_pdf_path, filename="translated.pdf")
->>>>>>> 6d9a06e05cf8dbdf2a4d2d6031a22347f5a15dee
+
