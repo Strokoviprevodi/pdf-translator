@@ -60,7 +60,7 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
 
     translated = completion.choices[0].message.content
 
-<<<<<<< HEAD
+
     # Generate new PDF with Unicode support
     pdf = FPDF()
     pdf.add_page()
@@ -71,7 +71,7 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     pdf.output(translated_pdf_path)
 
     return FileResponse(path=translated_pdf_path, filename="translated.pdf")
-=======
+
     # Generate new PDF
     pdf = FPDF()
     pdf.add_page()
