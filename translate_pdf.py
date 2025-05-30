@@ -5,23 +5,8 @@ import fitz  # PyMuPDF
 from openai import OpenAI
 from fpdf import FPDF
 import os
-import base64
-
-# =============== BASE64 ENCODED FONT (DejaVuSans.ttf, delni za prikaz; za produkcijo vzemi celoten base64 string) ===============
-dejavu_base64 = """
-AAEAAAARAQAABAAQRFNJRwAAAAEAAAAVAAAAHEdERUYAAAC8AAAAKAAAACBPUy8yAAABCAAAACAAAAAg
-AAACAAEAAAACAAAAAgAAAAEAAAAAAAAAAEAAAEAAAAQAAAEAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA
-...
-""" # To je delni prikaz. Za produkcijo je potreben celoten base64 string iz .ttf datoteke!
-
-font_path = "/tmp/DejaVuSans.ttf"
-
-if not os.path.exists(font_path):
-    with open(font_path, "wb") as f:
-        f.write(base64.b64decode(dejavu_base64))
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -60,8 +45,8 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
 
     translated = completion.choices[0].message.content
 
-
-    # Generate new PDF with Unicode support
+    # Generate new PDF with system Unicode font
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     pdf = FPDF()
     pdf.add_page()
     pdf.add_font("DejaVu", "", font_path, uni=True)
@@ -71,15 +56,3 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
     pdf.output(translated_pdf_path)
 
     return FileResponse(path=translated_pdf_path, filename="translated.pdf")
-
-    # Generate new PDF
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, translated)
-
-    translated_pdf_path = "/tmp/translated.pdf"
-    pdf.output(translated_pdf_path)
-
-    return FileResponse(path=translated_pdf_path, filename="translated.pdf")
-
