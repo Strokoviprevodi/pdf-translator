@@ -45,6 +45,11 @@ async def translate_pdf(file: UploadFile, sourceLang: str = Form(...), targetLan
 
     translated = completion.choices[0].message.content
 
+    print("======== EXTRACTED TEXT FROM PDF ========")
+    print(full_text[:1000])  # prvih 1000 znakov (za debug)
+    print("======== TRANSLATED TEXT ========")
+    print(translated[:1000])  # prvih 1000 znakov (za debug)
+
     # Generate new PDF with system Unicode font
     font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     pdf = FPDF()
