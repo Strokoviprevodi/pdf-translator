@@ -3,8 +3,5 @@ uvicorn
 python-multipart
 PyMuPDF
 openai
-<<<<<<< HEAD
 fpdf2
-=======
-fpdf
->>>>>>> 6d9a06e05cf8dbdf2a4d2d6031a22347f5a15dee
+
